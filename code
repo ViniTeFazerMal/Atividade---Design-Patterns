@@ -1,0 +1,117 @@
+interface Departamento {
+    getName(): string;
+    print(): void;
+}
+
+class Divisao implements Departamento {
+    constructor(private name: string) {}
+
+    getName(): string {
+        return this.name;
+    }
+
+    print(): void {
+        console.log(`Divisão: ${this.name}`);
+    }
+}
+
+class DepartamentoComposite implements Departamento {
+    private divisoes: Departamento[] = [];
+
+    constructor(private name: string) {}
+
+    add(departamento: Departamento): void {
+        this.divisoes.push(departamento);
+    }
+
+    remove(departamento: Departamento): void {
+        const index = this.divisoes.indexOf(departamento);
+        if (index !== -1) {
+            this.divisoes.splice(index, 1);
+        }
+    }
+
+    getName(): string {
+        return this.name;
+    }
+
+    print(): void {
+        console.log(`Departamento: ${this.name}`);
+        this.divisoes.forEach(divisao => divisao.print());
+    }
+}
+
+const departamentoTI = new DepartamentoComposite("TI");
+const divisaoDesenvolvimento = new Divisao("Desenvolvimento");
+const divisaoSuporte = new Divisao("Suporte");
+
+departamentoTI.add(divisaoDesenvolvimento);
+departamentoTI.add(divisaoSuporte);
+departamentoTI.print();
+
+class Reitoria {
+  private static instance: Reitoria;
+
+  private constructor() {}
+
+  static getInstance(): Reitoria {
+    if (!Reitoria.instance) {
+      Reitoria.instance = new Reitoria();
+    }
+    return Reitoria.instance;
+  }
+
+  announceImportantMessage(message: string): void {
+    console.log(`Anúncio da Reitoria: ${message}`);
+  }
+}
+
+const reitoria1 = Reitoria.getInstance();
+const reitoria2 = Reitoria.getInstance();
+console.log(reitoria1 === reitoria2); // Saída esperada: true
+
+interface Observer {
+  update(message: string): void;
+}
+
+interface Subject {
+  attach(observer: Observer): void;
+  detach(observer: Observer): void;
+  notify(message: string): void;
+}
+
+class UniCesumar implements Subject {
+  private observers: Observer[] = [];
+
+  attach(observer: Observer): void {
+    this.observers.push(observer);
+  }
+
+  detach(observer: Observer): void {
+    this.observers = this.observers.filter(obs => obs !== observer);
+  }
+
+  notify(message: string): void {
+    this.observers.forEach(observer => observer.update(message));
+  }
+
+  announceEvent(message: string): void {
+    console.log(`Evento anunciado: ${message}`);
+    this.notify(message);
+  }
+}
+
+class Student implements Observer {
+  constructor(private name: string) {}
+  update(message: string): void {
+    console.log(`${this.name} recebeu a notificação: ${message}`);
+  }
+}
+
+const unicesumar = new UniCesumar();
+const student1 = new Student("João");
+const student2 = new Student("Maria");
+
+unicesumar.attach(student1);
+unicesumar.attach(student2);
+unicesumar.announceEvent("Aula magna adiada para amanhã.");
